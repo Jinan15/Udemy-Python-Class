@@ -1,5 +1,45 @@
 from blackjack_classes import *
 
+suits = {'Hearts':'♥', 'Diamonds':'♦', 'Spades':'♣', 'Clubs':'♠'}
+ranks = {'Two':'2', 'Three':'3', 'Four':'4', 'Five':'5', 'Six':'6', 'Seven':'7', 'Eight':'8',
+            'Nine':'9', 'Ten':'10', 'Jack':'J', 'Queen':'Q', 'King':'K', 'Ace': 'A'}
+
+def make_card(card):
+    pcarddisplay = [] 
+    pcarddisplay.append("┌─────────┐")
+    pcarddisplay.append("│{}{}. . .│")
+    pcarddisplay.append("│. . . . .│")
+    pcarddisplay.append("│. . . . .│")
+    pcarddisplay.append("│. . {}. .│")
+    pcarddisplay.append("│. . . . .│")
+    pcarddisplay.append("│. . . . .│")
+    pcarddisplay.append("│. . .{}{}│")
+    pcarddisplay.append("└─────────┘")
+
+    if card.rank == 'Ten':
+        top = ("│", ranks[card.rank], ". . . .│")
+        pcarddisplay[1] = "".join(top)
+
+        bottom = ("│. . . .", ranks[card.rank], "│")
+        pcarddisplay[7] = "".join(bottom)
+    else:
+        top = ("│.", ranks[card.rank], ". . . .│")
+        pcarddisplay[1] = "".join(top)
+
+        bottom = ("│. . . .", ranks[card.rank], ".│")
+        pcarddisplay[7] = "".join(bottom)
+
+    if card.suit == "Diamonds":
+        pcarddisplay[4] = "│. . ♦ . .│"
+    if card.suit == "Clubs":
+        pcarddisplay[4] = "│. . ♣ . .│"
+    if card.suit == "Hearts":
+        pcarddisplay[4] = "│. . ♥ . .│"
+    if card.suit == "Spades":
+        pcarddisplay[4] = "│. . ♠ . .│"
+
+    return pcarddisplay
+
 def get_total_chips():
     ret = 0
     while True:
@@ -54,29 +94,29 @@ def hit_or_stand(deck, player_hand, dealer_hand):
 
 def surrender(player):
     while True:
-        player_input = input("Would you like to surrender (Yes or No)? ")
-        if player_input.lower() == 'yes':
+        player_input = input("Would you like to surrender (Y for yes or N for no)? ")
+        if player_input[0].lower() == 'y':
             player.total -= int(player.bet/2)
             return True
-        elif player_input.lower() == 'no':
+        elif player_input[0].lower() == 'n':
             return False
         else:
-            print("Invalid input! Please input yes or no")
+            print("Invalid input! Please input Y for yes or N for no")
 
 def split(player, hand_pos):
     if player.Hands[hand_pos].cards[0].value == player.Hands[hand_pos].cards[1].value:
         while True:
-            player_input = input("Would you like to split (Yes or No)? ")
-            if player_input.lower() == 'yes':
+            player_input = input("Would you like to split (Y for yes or N for no)? ")
+            if player_input[0].lower() == 'y':
                 if player.total > player.bet * 2:
                     return True
                 else:
                     print("Insufficient chips, only allowed to play single hand")
                     return False
-            elif player_input.lower() == 'no':
+            elif player_input[0].lower() == 'n':
                 return False
             else:
-                print("Invalid input! Please input yes or no")
+                print("Invalid input! Please input Y for yes or N for no")
     else:
         return False
 
@@ -84,23 +124,26 @@ def show_some(player_hand, dealer_hand):
     print()
     print("Dealer's Hand")
     print('-----------------------------------')
-    print("First card hidden, {}".format(dealer_hand.cards[1]))
-    print('-----------------------------------\n')
+    print("First card hidden")
+    print('\n'.join(map('  '.join, zip((make_card(dealer_hand.cards[1]))))))
+    print('-----------------------------------')
     print("Player's Hand")
     print('-----------------------------------')
-    print(*player_hand.cards, sep=', ')
+    print('\n'.join(map('  '.join, zip(*(make_card(c) for c in player_hand.cards)))))
+    # print(*player_hand.cards, sep=', ')
     print('-----------------------------------\n')
 
 def show_all(player_hand, dealer_hand):
+    print("-----------------------------------")
+    print("Game finished")
+    print("-----------------------------------")
     print("Dealer's Hand: ")
-    for card in dealer_hand.cards:
-        print(card)
+    print('\n'.join(map('  '.join, zip(*(make_card(c) for c in dealer_hand.cards)))))
 
     print("Value of Dealer's hand is: {}".format(dealer_hand.value))
 
     print("\nPlayer's Hand: ")
-    for card in player_hand.cards:
-        print(card)
+    print('\n'.join(map('  '.join, zip(*(make_card(c) for c in player_hand.cards)))))
 
     print("Value of Player's hand is: {}".format(player_hand.value))
 
